@@ -112,7 +112,7 @@ const services = [
     <PageContainer>
       {/* 🎥 Background Video */}
       <VideoBackground autoPlay loop muted playsInline>
-        <source src="/videos/v1.mp4" type="video/mp4" />
+        <source src="/videos/v2.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </VideoBackground>
 
@@ -126,10 +126,10 @@ const services = [
         sx={{ padding: "100px 20px", mt: -10}}
       >
         <Typography variant="h3" fontWeight="bold">
-          Welcome to <HighlightText>HOMITASK</HighlightText>
+          Welcome to <HighlightText>SLT Mobitel Alarm System</HighlightText>
         </Typography>
         <Typography variant="h6" sx={{ mt: 2 }}>
-          The Smarter Way to Manage Your Home Tasks.
+          Real-Time Visibility. Rapid Resolution.
         </Typography>
       </Box>
 
@@ -144,8 +144,7 @@ const services = [
         <Typography variant="body2" sx={{ mb: 3 }}>
           {" "}
           {/* 🔽 Smaller text */}
-          We offer a wide range of services to meet all your needs in the rubber
-          industry.
+          We deliver end-to-end alarm management—monitoring, prioritization, and analytics—to keep SLT-Mobitel networks always on.
         </Typography>
 
         <Container maxWidth="md">
@@ -180,4 +179,4 @@ const services = [
   );
 };
 
-export default Main;
+export default Main;
