@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Main from './Main';
 import Footer from './Footer';
 import UNavbar from './UNavbar';
@@ -31,51 +31,39 @@ const products = [
 // ----------------- Reactified Google Maps Component -----------------
 const MapSriLanka = ({ carrierFilter, setCarrierFilter }) => {
   const mapRef = useRef(null);
+  const [apiKey, setApiKey] = useState('');
   const [map, setMap] = useState(null);
   const [locations, setLocations] = useState([]);
   const [markers, setMarkers] = useState([]);
   const [formData, setFormData] = useState({ name: '', latitude: '', longitude: '', description: '' });
 
-  // Load Google Maps script dynamically
-  const loadGoogleMapsAPI = async () => {
-    const res = await fetch('/api/config');
-    const config = await res.json();
-    if (!config.hasGoogleMapsKey) {
-      alert('Google Maps API key not configured');
-      return;
-    }
+  useEffect(() => {
+    fetch('/api/config')
+      .then(res => res.json())
+      .then(data => {
+        setApiKey(data.googleMapsApiKey);
+      });
+  }, []);
 
-    return new Promise((resolve, reject) => {
-      if (window.google && window.google.maps) {
-        resolve();
-        return;
+  useEffect(() => {
+    if (!apiKey) return;
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}`;
+    script.async = true;
+    script.onload = () => {
+      if (window.google) {
+        const m = new window.google.maps.Map(mapRef.current, {
+          center: { lat: 7.8731, lng: 80.7718 },
+          zoom: 7,
+        });
+        setMap(m);
       }
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${config.googleMapsApiKey}`;
-      script.async = true;
-      script.defer = true;
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  };
-
-
-
-
-
-  
-
-  // Initialize map dynamically
-  const initMap = () => {
-    if (!mapRef.current) return;
-    const m = new window.google.maps.Map(mapRef.current, {
-      zoom: 7,
-      center: { lat: 7.8731, lng: 80.7718 }, // Sri Lanka
-      mapTypeId: 'roadmap',
-    });
-    setMap(m);
-  };
+    };
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, [apiKey]);
 
   // Load locations from backend
   const loadLocations = async () => {
@@ -125,14 +113,6 @@ const MapSriLanka = ({ carrierFilter, setCarrierFilter }) => {
       map.fitBounds(bounds);
     }
   }, [map, locations, carrierFilter]);
-
-  useEffect(() => {
-    (async () => {
-      await loadGoogleMapsAPI();
-      initMap();
-      await loadLocations();
-    })();
-  }, []);
 
   // Add location handler
   const handleAddLocation = async (e) => {
@@ -231,32 +211,15 @@ const MapSriLanka = ({ carrierFilter, setCarrierFilter }) => {
 const Home = () => {
   const [carrierFilter, setCarrierFilter] = useState('All');
 
-  const filteredProducts = useMemo(() => {
-    if (carrierFilter === 'All') return products;
-    return products.filter(p => p.carrier === carrierFilter);
-  }, [carrierFilter]);
-
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", overflow: "hidden" }}>
       <UNavbar />
 
       {/* Content area */}
-      <Box sx={{ display: "flex", gap: 2, flex: 1, px: 2, pb: 2, pt: 2 }}>
-        
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {/* Map + Sidebar with filter & form */}
-          <Box sx={{ flex: 1, minHeight: 500, borderRadius: 2, overflow: 'hidden', boxShadow: 1 }}>
-            <MapSriLanka carrierFilter={carrierFilter} setCarrierFilter={setCarrierFilter} />
-          </Box>
-
-          {/* Products */}
-          <Box sx={{ flex: 1, minHeight: 200 }}>
-            <Main products={filteredProducts} />
-          </Box>
-        </Box>
+      <Box sx={{ flex: 1 }}>
+        {/* Pass MapSriLanka as a prop to Main */}
+        <Main MapComponent={() => <MapSriLanka carrierFilter={carrierFilter} setCarrierFilter={setCarrierFilter} />} />
       </Box>
-
-      
 
       <Footer />
     </Box>

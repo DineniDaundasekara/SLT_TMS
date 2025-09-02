@@ -81,7 +81,7 @@ const UNavbar = () => {
           >
             <HomeIcon sx={{ marginRight: "8px" }} />
             <AnimatedTextContainer variant="h6">
-              Say Goodbye to Cluttered Plans – Start Organizing with HomiTask!
+              Bye Busywork — Hello Auto-Escalations & Faster Resolutions
             </AnimatedTextContainer>
           </RouterLink>
         </Box>
