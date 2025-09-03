@@ -84,12 +84,13 @@ app.post("/api/locations", async (req, res) => {
   }
 });
 
-// Update a location (PUT)
+// Update a location (PUT) - Edit functionality added
 app.put("/api/locations/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { name, latitude, longitude, description } = req.body;
 
+    // Find location by ID and update its fields
     const updatedLocation = await Location.findByIdAndUpdate(
       id,
       {
@@ -97,13 +98,15 @@ app.put("/api/locations/:id", async (req, res) => {
         ...(latitude && longitude && { coordinates: { latitude, longitude } }),
         ...(description && { description: description.trim() }),
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true } // `new: true` returns the updated document, `runValidators: true` ensures validation is applied
     );
 
+    // Check if location is found
     if (!updatedLocation) {
       return res.status(404).json({ error: "Location not found" });
     }
 
+    // Return the updated location
     res.json({ success: true, location: updatedLocation });
   } catch (error) {
     console.error("Error updating location:", error);
